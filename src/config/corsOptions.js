@@ -12,7 +12,7 @@ const allowedOrigins = require('./allowedOrigins')
 //     optionsSuccessStatus: 200
 // }
 
-let whitelist = ['http://localhost:5173', 'http://127:0:0:1:5173', 'https://collective-futures.org', 'https://collective-futures.onrender.com']
+let whitelist = ['http://localhost:5173', 'http://127:0:0:1:3000']
 let corsOptions = {
   origin: function (origin, callback) {
     if (whitelist.indexOf(origin) !== -1 || !origin) {

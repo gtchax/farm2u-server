@@ -7,16 +7,14 @@ import {
   RESEND_API_KEY,
 } from "./variables";
 
-const resend = new Resend(RESEND_API_KEY);
+// const resend = new Resend(RESEND_API_KEY);
 
 export const generateToken = (length = 6) => {
   let otp = "";
-
   for (let i = 0; i < length; i++) {
     let digit = Math.floor(Math.random() * 10);
     otp += digit;
   }
-
   return otp;
 };
 
@@ -27,21 +25,21 @@ interface Email {
   html: string; // "<strong>it works!</strong>",
 }
 
-// export const mailTransporter = () => {
-// return nodemailer.createTransport({
-//   host: "sandbox.smtp.mailtrap.io",
-//   port: 2525,
-//   auth: {
-//     user: MAILTRAP_USER,
-//     pass: MAILTRAP_PASSWORD,
-//   },
-// });
-// };
-
-export const mailTransporter = async (mail: Email) => {
-  const data = await resend.emails.send(mail);
-  return data;
+export const mailTransporter = () => {
+return nodemailer.createTransport({
+  host: "sandbox.smtp.mailtrap.io",
+  port: 2525,
+  auth: {
+    user: MAILTRAP_USER,
+    pass: MAILTRAP_PASSWORD,
+  },
+});
 };
+
+// export const mailTransporter = async (mail: Email) => {
+//   const data = await resend.emails.send(mail);
+//   return data;
+// };
 
 interface Profile {
   name: string;
@@ -63,12 +61,12 @@ interface Profile {
 export const sendVerificationMail = async (token: string, profile: Profile) => {
   const { name, email, userId } = profile;
 
-  mailTransporter({
-    to: email,
-    subject: "Welcome to Farm2U!",
-    from: VERIFICATION_MAIL,
-    html: `<h1>Hi ${name}, welcome to Farm2U! Use the given OTP to verify your email. Your verification token is: ${token}</h1>`,
-  });
+  // mailTransporter({
+  //   to: email,
+  //   subject: "Welcome to Farm2U!",
+  //   from: VERIFICATION_MAIL,
+  //   html: `<h1>Hi ${name}, welcome to Farm2U! Use the given OTP to verify your email. Your verification token is: ${token}</h1>`,
+  // });
 };
 
 interface Options {
@@ -101,12 +99,12 @@ export const sendForgetPasswordLink = async (options: Options) => {
    ${link}
    `;
 
-  mailTransporter({
-    to: email,
-    from: VERIFICATION_MAIL,
-    subject: "Reset Password Link",
-    html: message,
-  });
+  // mailTransporter({
+  //   to: email,
+  //   from: VERIFICATION_MAIL,
+  //   subject: "Reset Password Link",
+  //   html: message,
+  // });
 };
 
 interface MailOptions {
@@ -118,10 +116,10 @@ export const sendPasswordRestSuccess = async (options: MailOptions) => {
   const { name, email } = options;
   const message = `Dear ${name} we just updated your new password. You can now sign in with your new password.`;
 
-   mailTransporter({
-    to: [email],
-    from: VERIFICATION_MAIL,
-    subject: "Password Reset Successfully",
-    html: message,
-  });
+  //  mailTransporter({
+  //   to: [email],
+  //   from: VERIFICATION_MAIL,
+  //   subject: "Password Reset Successfully",
+  //   html: message,
+  // });
 };
