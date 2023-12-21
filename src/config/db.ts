@@ -1,11 +1,14 @@
 import { DEV_URI } from "@/utils/variables";
 import mongoose from "mongoose";
 
-mongoose
-  .connect(DEV_URI)
-  .then(() => {
-    console.log("DB connected successfully");
-  })
-  .catch((err) => {
-    console.log(err);
-  });
+  const connectDB = async () => {
+    try {
+        const connectionInstance = await mongoose.connect(`${DEV_URI}`)
+        console.log(`\n MongoDB connected | DB HOST: ${connectionInstance.connection.host}`);
+    } catch (error) {
+        console.log("MONGODB connection FAILED ", error);
+        process.exit(1)
+    }
+}
+
+export default connectDB
