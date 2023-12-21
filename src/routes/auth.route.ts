@@ -2,8 +2,8 @@ import {
   verifyEmail,
   sendReverificationToken,
   signIn,
-} from "@/controllers/auth";
-import { createUser } from "@/controllers/user";
+} from "@/controllers/auth.controller";
+import { createUser } from "@/controllers/user.controller";
 import { isAuth } from "@/middleware/auth";
 import { validate } from "@/middleware/validate";
 import {
@@ -20,4 +20,4 @@ router.post("/sign-in", validate(EmailValidationSchema), isAuth, signIn);
 router.post("/verify-email", validate(TokenAndIDValidation), verifyEmail);
 router.post("/re-verify-email", sendReverificationToken);
 
-export default router;
+export { router };

@@ -4,8 +4,6 @@ import { JWT_SECRET } from "@/utils/variables";
 import { JwtPayload, verify } from "jsonwebtoken";
 import User from "@/models/user";
 
-
-
 export const isValidPasswordResetToken: RequestHandler = async (
   req,
   res,
@@ -30,13 +28,15 @@ export const isValidPasswordResetToken: RequestHandler = async (
 
 export const isAuth: RequestHandler = async (req, res, next) => {
   const { authorization } = req.headers;
-  const token = authorization?.split("Bearer")[1] || req.cookies.jwtFarm2u;
-  if (!token) return res.status(403).json({ error: "Unauthorized request" });
+  const token = authorization?.replace("Bearer ", "") || req.cookies.jwt_f2u;
+  if (!token) return res.sendStatus(403);
 
   const payload = verify(token, JWT_SECRET) as JwtPayload;
+  if (!payload) return res.sendStatus(403)
   const id = payload.userId;
-  const user = await User.findOne({ _id: id, tokens: token });
-  if (!user) return res.status(403).json({ error: "Unauthorized request" });
+  const user = await User.findOne({ _id: id, refreshToken: token });
+  if (!user) return res.sendStatus(403)
+
   req.user = {
     id: user._id,
     name: user.name,

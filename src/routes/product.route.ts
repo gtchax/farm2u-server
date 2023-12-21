@@ -1,4 +1,4 @@
-import { getProducts, getProductById } from "@/controllers/product";
+import { getProducts, getProductById } from "@/controllers/product.controller";
 import { Router } from "express";
 
 const router = Router();
@@ -6,4 +6,4 @@ const router = Router();
 router.get("/", getProducts);
 router.get("/:id", getProductById);
 
-export default router;
+export {router};

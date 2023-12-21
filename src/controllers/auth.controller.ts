@@ -19,11 +19,11 @@ export const signIn: RequestHandler = async (req, res) => {
   if (!matched)
     return res.status(403).json({ error: "Email/Password mismatch" });
   const token = jwt.sign({ userId: user._id }, JWT_SECRET);
-  user.tokens.push(token);
+  user.refreshToken.push(token);
   await user.save();
 
   return res
-    .cookie("jwtFarm2u", token, {
+    .cookie("jwt_f2u", token, {
       httpOnly: true,
       sameSite: "strict",
       maxAge: 30 * 24 * 60 * 1000, // 30 Days
@@ -36,7 +36,7 @@ export const signIn: RequestHandler = async (req, res) => {
 
 export const signOut: RequestHandler = async (req, res) => {
   return res
-    .clearCookie("jwtFarm2u", {
+    .clearCookie("jwt_f2u", {
       httpOnly: true,
       sameSite: "none",
     })
@@ -89,3 +89,5 @@ export const verifyEmail: RequestHandler = async (
 export const grantValid: RequestHandler = async (req, res) => {
   return res.json({ valid: true });
 };
+
+

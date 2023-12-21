@@ -1,5 +1,10 @@
-import { generateForgotPasswordLink, updatePassword, deleteUser, getUser } from "@/controllers/user";
-import { grantValid } from "@/controllers/auth";
+import {
+  generateForgotPasswordLink,
+  updatePassword,
+  deleteUser,
+  getUser,
+} from "@/controllers/user.controller";
+import { grantValid } from "@/controllers/auth.controller";
 import { isAuth, isValidPasswordResetToken } from "@/middleware/auth";
 import { validate } from "@/middleware/validate";
 import { TokenAndIDValidation } from "@/utils/validationSchema";
@@ -10,7 +15,7 @@ const router = Router();
 // Auth guard
 router.use(isAuth);
 
-router.get('/get-user', getUser)
+router.get("/get-user", getUser);
 router.post("/forgot-password", generateForgotPasswordLink);
 router.post(
   "/verify-password-reset-token",
@@ -24,5 +29,5 @@ router.post(
   isValidPasswordResetToken,
   updatePassword
 );
-router.delete('/delete-user', deleteUser)
-export default router;
+router.delete("/delete-user", deleteUser);
+export { router };

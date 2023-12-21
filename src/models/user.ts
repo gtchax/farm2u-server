@@ -9,7 +9,7 @@ interface IUser {
   verified: boolean;
   roles: string;
   avatar?: { url: string; publicId: string };
-  tokens: string[];
+  refreshToken: string[];
   favourites: ObjectId[];
 }
 
@@ -26,7 +26,7 @@ const userSchema = new Schema<IUser, {}, Methods>(
     verified: { type: Boolean, default: false },
     avatar: { type: Object, url: String, publicId: String },
     roles: { type: String, default: "Client" },
-    tokens: [String],
+    refreshToken: [String],
     favourites: [{ type: Schema.Types.ObjectId, ref: "Product" }],
   },
   { timestamps: true }
