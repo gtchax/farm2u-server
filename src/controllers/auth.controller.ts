@@ -63,13 +63,26 @@ export const signIn: RequestHandler = async (req, res) => {
 };
 
 export const signOut: RequestHandler = async (req, res) => {
-  return res
-    .clearCookie("jwt_f2u", {
+  const { authorization } = req.headers;
+  const refreshToken =
+    authorization?.replace("Bearer ", "") || req.cookies.jwt_f2u;
+  if (!refreshToken) return res.sendStatus(204);
+
+  const user = await User.findOne({ refreshToken }).exec();
+  if (!user) {
+    res.clearCookie("jwt_f2u", {
       httpOnly: true,
       sameSite: "none",
-    })
-    .status(200)
-    .json({ message: "Logged out successfully" });
+    });
+    return res.sendStatus(204);
+  }
+  user.refreshToken = user.refreshToken.filter((t) => t !== refreshToken);
+  await user.save();
+  res.clearCookie("jwt_f2u", {
+    httpOnly: true,
+    sameSite: "none",
+  });
+  return res.sendStatus(204);
 };
 
 export const sendReverificationToken: RequestHandler = async (req, res) => {
