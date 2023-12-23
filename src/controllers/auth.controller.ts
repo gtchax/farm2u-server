@@ -5,9 +5,11 @@ import { VerifyEmailRequest } from "@/@types/user";
 import User from "@/models/user";
 import { generateToken, sendVerificationMail } from "@/utils/helper";
 import { isValidObjectId } from "mongoose";
-import { JWT_SECRET } from "@/utils/variables";
+import { JWT_SECRET, REFRESH_JWT_SECRET } from "@/utils/variables";
+import { refreshToken } from "./refresh.controller";
 
 export const signIn: RequestHandler = async (req, res) => {
+  const cookies = req.cookies;
   const { password, email } = req.body;
 
   const user = await User.findOne({
@@ -18,19 +20,45 @@ export const signIn: RequestHandler = async (req, res) => {
   const matched = await user.comparePassword(password);
   if (!matched)
     return res.status(403).json({ error: "Email/Password mismatch" });
-  const token = jwt.sign({ userId: user._id }, JWT_SECRET);
-  user.refreshToken.push(token);
+
+  const accessToken = jwt.sign({ userId: user._id }, JWT_SECRET, {
+    expiresIn: "0.5h",
+  });
+  const newRefreshToken = jwt.sign({ userId: user._id }, REFRESH_JWT_SECRET, {
+    expiresIn: "1d",
+  });
+
+  let newRefreshTokenArray = !cookies?.jwt_f2u
+    ? user.refreshToken
+    : user.refreshToken.filter((t) => t !== cookies?.jwt_f2u);
+
+  if (cookies?.jwt_f2u) {
+    const refreshToken = cookies.jwt;
+    const foundToken = await User.findOne({ refreshToken }).exec();
+
+    // Detected refresh token reuse!
+    if (!foundToken) {
+      // clear out ALL previous refresh tokens
+      newRefreshTokenArray = [];
+    }
+    res.clearCookie("jwt_f2u", {
+      httpOnly: true,
+      sameSite: "none",
+    });
+  }
+
+  user.refreshToken = [...newRefreshTokenArray, newRefreshToken];
   await user.save();
 
   return res
-    .cookie("jwt_f2u", token, {
+    .cookie("jwt_f2u", newRefreshToken, {
       httpOnly: true,
       sameSite: "strict",
       maxAge: 30 * 24 * 60 * 1000, // 30 Days
     })
     .status(200)
     .json({
-      profile: req.user,
+      accessToken,
     });
 };
 
@@ -89,5 +117,3 @@ export const verifyEmail: RequestHandler = async (
 export const grantValid: RequestHandler = async (req, res) => {
   return res.json({ valid: true });
 };
-
-
