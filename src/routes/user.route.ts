@@ -5,7 +5,7 @@ import {
   getUser,
 } from "@/controllers/user.controller";
 import { grantValid } from "@/controllers/auth.controller";
-import { isAuth, isValidPasswordResetToken } from "@/middleware/auth";
+import { checkEmailVerification, isAuth, isValidPasswordResetToken } from "@/middleware/auth";
 import { validate } from "@/middleware/validate";
 import { TokenAndIDValidation } from "@/utils/validationSchema";
 import { Router } from "express";
@@ -14,6 +14,8 @@ const router = Router();
 
 // Auth guard
 router.use(isAuth);
+router.use(checkEmailVerification)
+
 
 router.get("/get-user", getUser);
 router.post("/forgot-password", generateForgotPasswordLink);

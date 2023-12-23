@@ -1,5 +1,5 @@
 import nodemailer from "nodemailer";
-import { Resend } from "resend";
+// import { Resend } from "resend";
 import {
   MAILTRAP_USER,
   MAILTRAP_PASSWORD,
@@ -26,14 +26,14 @@ interface Email {
 }
 
 export const mailTransporter = () => {
-return nodemailer.createTransport({
-  host: "sandbox.smtp.mailtrap.io",
-  port: 2525,
-  auth: {
-    user: MAILTRAP_USER,
-    pass: MAILTRAP_PASSWORD,
-  },
-});
+  return nodemailer.createTransport({
+    host: "sandbox.smtp.mailtrap.io",
+    port: 2525,
+    auth: {
+      user: MAILTRAP_USER,
+      pass: MAILTRAP_PASSWORD,
+    },
+  });
 };
 
 // export const mailTransporter = async (mail: Email) => {
@@ -60,13 +60,13 @@ interface Profile {
 // };
 export const sendVerificationMail = async (token: string, profile: Profile) => {
   const { name, email, userId } = profile;
-
-  // mailTransporter({
-  //   to: email,
-  //   subject: "Welcome to Farm2U!",
-  //   from: VERIFICATION_MAIL,
-  //   html: `<h1>Hi ${name}, welcome to Farm2U! Use the given OTP to verify your email. Your verification token is: ${token}</h1>`,
-  // });
+  const transport = mailTransporter();
+  transport.sendMail({
+    to: email,
+    subject: "Welcome to Farm2U!",
+    from: VERIFICATION_MAIL,
+    html: `<h1>Hi ${name}, welcome to Farm2U! Use the given OTP to verify your email. Your verification token is: ${token}</h1>`,
+  });
 };
 
 interface Options {
@@ -74,24 +74,9 @@ interface Options {
   link: string;
 }
 
-// export const sendForgetPasswordLink = async (options: Options) => {
-//   const transport = mailTransporter();
-
-//   const { link, email } = options;
-
-//   const message = `We just received a request that you forgot your password.
-//    No problem you can use the link and create a new password.
-//    ${link}
-//    `;
-
-//   transport.sendMail({
-//     to: email,
-//     from: VERIFICATION_MAIL,
-//     subject: "Reset Password Link",
-//     html: message,
-//   });
-// };
 export const sendForgetPasswordLink = async (options: Options) => {
+  const transport = mailTransporter();
+
   const { link, email } = options;
 
   const message = `We just received a request that you forgot your password.
@@ -99,27 +84,43 @@ export const sendForgetPasswordLink = async (options: Options) => {
    ${link}
    `;
 
-  // mailTransporter({
-  //   to: email,
-  //   from: VERIFICATION_MAIL,
-  //   subject: "Reset Password Link",
-  //   html: message,
-  // });
+  transport.sendMail({
+    to: email,
+    from: VERIFICATION_MAIL,
+    subject: "Reset Password Link",
+    html: message,
+  });
 };
+
+// export const sendForgetPasswordLink = async (options: Options) => {
+//   const { link, email } = options;
+
+//   const message = `We just received a request that you forgot your password.
+//    No problem you can use the link and create a new password.
+//    ${link}
+//    `;
+
+// mailTransporter({
+//   to: email,
+//   from: VERIFICATION_MAIL,
+//   subject: "Reset Password Link",
+//   html: message,
+// });
+// };
 
 interface MailOptions {
   email: string;
   name: string;
 }
 export const sendPasswordRestSuccess = async (options: MailOptions) => {
-
+  const transport = mailTransporter();
   const { name, email } = options;
   const message = `Dear ${name} we just updated your new password. You can now sign in with your new password.`;
 
-  //  mailTransporter({
-  //   to: [email],
-  //   from: VERIFICATION_MAIL,
-  //   subject: "Password Reset Successfully",
-  //   html: message,
-  // });
+  transport.sendMail({
+    to: [email],
+    from: VERIFICATION_MAIL,
+    subject: "Password Reset Successfully",
+    html: message,
+  });
 };

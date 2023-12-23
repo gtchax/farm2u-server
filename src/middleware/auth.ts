@@ -25,6 +25,27 @@ export const isValidPasswordResetToken: RequestHandler = async (
 
   next();
 };
+export const checkEmailVerification: RequestHandler = async (
+  req,
+  res,
+  next
+) => {
+  const { email } = req.body;
+
+  const user = await User.findOne({email });
+  if (!user)
+    return res
+      .status(401)
+      .json({ error: "User not found" });
+
+ 
+  if (!user.verified)
+    return res
+      .status(401)
+      .json({ error: "Email not verified. Please check your email for verification instructions." });
+
+  next();
+};
 
 export const isAuth: RequestHandler = async (req, res, next) => {
   const { authorization } = req.headers;
